@@ -15,14 +15,13 @@ function Login() {
       JSON.stringify({ name: name, email: email })
     );
     try {
-      await postLogin(email, name, password);
+      const { data } = await postLogin(email, name, password);
       localStorage.setItem(
         'userFinancias',
-        JSON.stringify({ name: name, email: email })
+        JSON.stringify({ name: name, email: email, id: data.id })
       );
-      history.push('/controle')
-    }
-    catch (err) {
+      history.push('/controle');
+    } catch (err) {
       console.log(err);
     }
   };

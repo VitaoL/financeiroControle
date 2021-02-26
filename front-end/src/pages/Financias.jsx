@@ -1,17 +1,28 @@
 import React, { useState } from 'react';
 import '../css/Financias.css';
+import ListSaldo from '../components/ListSaldo';
+import { postTransitions } from '../services/FinanciasApi.js';
 
 const Financias = () => {
   const [array, setArray] = useState([]);
   const [value, setValue] = useState('');
   const [description, setDescription] = useState('');
   const [control, setControl] = useState('');
-  const { name } = JSON.parse(localStorage.getItem('userFinancias'));
+  const [investment, setInvestment] = useState('bill');
+  const { id } = JSON.parse(localStorage.getItem('userFinancias'));
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setArray([...array, { control, description, value }]);
-    setValue('');
-    setDescription('');
+    if (control === 'payment') {
+      setValue(value * -1)
+    }
+    try {
+      await postTransitions({description, value, investment, userId: id})
+      setValue('');
+      setDescription('');
+      setInvestment('bill');
+    } catch (err) {
+      console.log(err.message);
+    }
   };
   return (
     <div className="container-financias">
@@ -50,7 +61,10 @@ const Financias = () => {
             type="number"
             name="value"
             onChange={(e) => setValue(e.target.value)}
-            value={value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            value={value.toLocaleString('pt-BR', {
+              style: 'currency',
+              currency: 'BRL',
+            })}
             required
           />
         </label>
@@ -65,42 +79,19 @@ const Financias = () => {
             value={description}
           />
         </label>
-        <input className="submit-login" type="submit" value="Submit"></input>
-      </form>
-      <div className="card-div">
-        <div className="header-account">
-          <p>{name}</p>
-          <p>saldo: </p>
+        <div>
+          <input
+            type="checkbox"
+            name="investment"
+            value="investment"
+            checked={investment == "investment"}
+            onChange={(e) => setInvestment(e.target.value)}
+          />
+          <label htmlFor="investment">investment</label>
         </div>
-        {array && array.length > 0 && (
-          <div>
-            {array.map(({ value, description, control }, index) => {
-              return (
-                <div key={`${description} ${index}`}>
-                  {control === 'payment' && (
-                    <div className="card-payment">
-                      <p className={control}>R$ {value * -1}</p>
-                      <div className="trans">
-                        <span>24/04/21</span>
-                        <span>{description}</span>
-                      </div>
-                    </div>
-                  )}
-                  {control === 'deposit' && (
-                    <div className="card-deposit">
-                      <p className={control}>R$ {value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                      <div className="trans">
-                        <span>24/04/21</span>
-                        <span>{description}</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            }).reverse()}
-          </div>
-        )}
-      </div>
+        <input className="submit-login" type="submit" value="Submit" />
+      </form>
+      <ListSaldo array={array} />
     </div>
   );
 };

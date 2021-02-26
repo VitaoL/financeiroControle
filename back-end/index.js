@@ -11,6 +11,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
 app.post('/login', controllers.login.userLogin);
+app.post('/controle', controllers.login.userLogin);
 
 app.use((err, _req, res, _next) => {
   res.status(405).json({ err : err.message });
