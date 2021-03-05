@@ -4,19 +4,21 @@ import ListSaldo from '../components/ListSaldo';
 import { postTransitions } from '../services/FinanciasApi.js';
 
 const Financias = () => {
-  const [array, setArray] = useState([]);
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState(0);
   const [description, setDescription] = useState('');
   const [control, setControl] = useState('');
   const [investment, setInvestment] = useState('bill');
   const { id } = JSON.parse(localStorage.getItem('userFinancias'));
+  let alvo = 0;
   const handleSubmit = async (event) => {
+    alvo++;
     event.preventDefault();
+    let num = value;
     if (control === 'payment') {
-      setValue(value * -1)
+      num = value * -1;
     }
     try {
-      await postTransitions({description, value, investment, userId: id})
+      await postTransitions(description, num, investment, id);
       setValue('');
       setDescription('');
       setInvestment('bill');
@@ -60,11 +62,8 @@ const Financias = () => {
             className="input-login"
             type="number"
             name="value"
-            onChange={(e) => setValue(e.target.value)}
-            value={value.toLocaleString('pt-BR', {
-              style: 'currency',
-              currency: 'BRL',
-            })}
+            onChange={(e) => setValue(parseFloat(e.target.value))}
+            value={parseFloat(value)}
             required
           />
         </label>
@@ -84,14 +83,16 @@ const Financias = () => {
             type="checkbox"
             name="investment"
             value="investment"
-            checked={investment == "investment"}
-            onChange={(e) => setInvestment(e.target.value)}
+            onClick={(e) => {
+              if (investment === 'investment') return setInvestment('bill');
+              return setInvestment(e.target.value);
+            }}
           />
           <label htmlFor="investment">investment</label>
         </div>
         <input className="submit-login" type="submit" value="Submit" />
       </form>
-      <ListSaldo array={array} />
+      <ListSaldo alvo={alvo} />
     </div>
   );
 };

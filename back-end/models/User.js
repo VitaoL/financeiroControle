@@ -1,6 +1,6 @@
 const User = (sequelize, DataTypes) => {
   const User = sequelize.define(
-    'Users',
+    'User',
     {
       name: DataTypes.STRING,
       email: DataTypes.STRING,
@@ -10,7 +10,9 @@ const User = (sequelize, DataTypes) => {
       timestamps: false,
     }
   );
-
+  // User.associate = (models) => {
+  //   User.hasMany(models.Trasnferencias, { as: 'transferencias', foreignKey: 'userId' })
+  // }
   return User;
 };
 
