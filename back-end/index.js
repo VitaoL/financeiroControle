@@ -13,7 +13,6 @@ app.use(cors());
 app.use('/login', controllers.login);
 app.use('/controle', controllers.transferencias);
 
-
 app.use((err, _req, res, _next) => {
   res.status(405).json({ err : err.message });
 });
